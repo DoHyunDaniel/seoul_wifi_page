@@ -48,3 +48,5 @@ buildNumber.properties
 
 # End of https://www.toptal.com/developers/gitignore/api/java,maven
 /build/
+/.apt_generated/
+/.apt_generated_tests/
