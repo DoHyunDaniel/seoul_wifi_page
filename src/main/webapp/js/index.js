@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	// 검색 기록 저장 요청 함수
 	async function saveSearchHistory(latitude, longitude, searchDate) {
 		try {
-			const response = await fetch('/be1_java_web_study01/searchHistory', {
+			const response = await fetch('/be1_java_web_study01/saveSearchHistory', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/x-www-form-urlencoded',

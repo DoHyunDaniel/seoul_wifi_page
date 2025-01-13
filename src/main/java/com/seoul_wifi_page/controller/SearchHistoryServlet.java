@@ -14,7 +14,7 @@ import com.google.gson.Gson;
 import com.seoul_wifi_page.dto.SearchHistory;
 import com.seoul_wifi_page.service.SearchHistoryService;
 
-@WebServlet("/searchHistoryData")
+@WebServlet("/searchHistory")
 public class SearchHistoryServlet extends HttpServlet {
 
     private SearchHistoryService searchHistoryService;

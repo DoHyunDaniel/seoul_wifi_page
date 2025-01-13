@@ -1,16 +1,17 @@
 document.addEventListener("DOMContentLoaded", async () => {
     const tableBody = document.querySelector("#history-table tbody");
     const totalCountSpan = document.getElementById("total-count");
-	const homeButton = document.getElementById("home");
+    const homeButton = document.getElementById("home");
 
-	// 홈 버튼 누르면
-	homeButton.addEventListener("click", () => {
-		window.location.href = "/be1_java_web_study01/index.jsp";
-	})
+    // 홈 버튼 누르면
+    homeButton.addEventListener("click", () => {
+        window.location.href = "/be1_java_web_study01/index.jsp";
+    });
+
     // 데이터 로드 함수
     async function loadSearchHistory() {
         try {
-            const response = await fetch("/be1_java_web_study01/searchHistoryData");
+            const response = await fetch("/be1_java_web_study01/searchHistory");
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
             const { historyList, totalCount } = await response.json();
@@ -30,7 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             <button class="delete-btn" data-id="${history.id}">삭제</button>
                         </td>
                     </tr>`;
-                tableBody.innerHTML += row;
+                tableBody.insertAdjacentHTML("beforeend", row);
             });
 
             // 총 개수 업데이트
@@ -45,15 +46,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 삭제 이벤트 리스너 추가
     function addDeleteEventListeners() {
-        const deleteButtons = document.querySelectorAll(".delete-btn");
-        deleteButtons.forEach((button) => {
-            button.addEventListener("click", async (e) => {
-                const id = e.target.getAttribute("data-id");
-                console.log(`Deleting ID: ${id}`);
-                await deleteSearchHistory(id);
-                await loadSearchHistory(); // 데이터 새로고침
-            });
+        document.querySelectorAll(".delete-btn").forEach((button) => {
+            // 기존 이벤트 제거 후 추가
+            button.removeEventListener("click", handleDeleteEvent);
+            button.addEventListener("click", handleDeleteEvent);
         });
+    }
+
+    // 삭제 이벤트 처리 함수
+    async function handleDeleteEvent(e) {
+        const id = e.target.getAttribute("data-id");
+        console.log(`Deleting ID: ${id}`);
+        await deleteSearchHistory(id);
+        location.reload(); // 페이지 새로고침
     }
 
     // 삭제 요청 함수
@@ -61,8 +66,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             const response = await fetch(`/be1_java_web_study01/deleteSearchHistory`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id })
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `id=${id}`
             });
             if (!response.ok) throw new Error(`Failed to delete search history with ID ${id}`);
             console.log(`Deleted search history with ID ${id}`);

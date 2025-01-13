@@ -64,13 +64,5 @@ public class GetResultsServlet extends HttpServlet {
             this.wifiData = wifiData;
             this.totalCount = totalCount;
         }
-
-        public List<WifiRow> getWifiData() {
-            return wifiData;
-        }
-
-        public int getTotalCount() {
-            return totalCount;
-        }
     }
 }

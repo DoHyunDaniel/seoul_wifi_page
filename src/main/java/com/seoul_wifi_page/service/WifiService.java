@@ -33,85 +33,85 @@ public class WifiService {
 		// API 호출
 		MyOkHttp3 ok = new MyOkHttp3();
 
-		// 소수의 데이터만
-		String result;
-		try {
-			result = ok.getApiResult(1, 1000); // API 데이터 범위 확장
-		} catch (IOException e) {
-			System.err.println("Failed to fetch data from API.");
-			e.printStackTrace();
-			return;
-		}
-
-		if (result == null || result.isEmpty()) {
-			System.err.println("API result is null or empty.");
-			return;
-		}
-
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		TbPublicWifiInfoWrapper wifiInfoWrapper = gson.fromJson(result, TbPublicWifiInfoWrapper.class);
-		TbPublicWifiInfo wifiInfo = wifiInfoWrapper.getTbPublicWifiInfo();
-
-		if (wifiInfo == null) {
-			System.err.println("Failed to parse JSON into TbPublicWifiInfo.");
-			return;
-		}
-
-		dbHelper.resetWifiInfo();
-		dbHelper.createTable();
-
-		List<WifiRow> rows = wifiInfo.getRow();
-		if (rows != null && !rows.isEmpty()) {
-			for (WifiRow row : rows) {
-				double distance = calculateDistance(userLat, userLon, row.getLatitude(), row.getLongitude());
-				row.setDistance(distance); // 거리 계산 후 저장
-				dbHelper.insertWifiInfo(row);
-			}
-		} else {
-			System.err.println("No rows found in the data.");
-		}
-
-//		// 반복문으로 공공데이터 db에 삽입
-//		int start = 1;
-//		int end = 1000;
-//		boolean hasMoreData = true;
-//		while (hasMoreData) {
-//			try {
-//				System.out.println("Fetching data from " + start + " to " + end);
-//				String result = ok.getApiResult(start, end);
-//
-//				// API 응답이 null이거나 비어 있는지 확인
-//				if (result == null || result.isEmpty()) {
-//					System.err.println("API result is null or empty.");
-//					break;
-//				}
-//				// JSON 파싱
-//				Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//				TbPublicWifiInfoWrapper wifiInfoWrapper = gson.fromJson(result, TbPublicWifiInfoWrapper.class);
-//				TbPublicWifiInfo wifiInfo = wifiInfoWrapper.getTbPublicWifiInfo();
-//
-//				if (wifiInfo == null || wifiInfo.getRow() == null || wifiInfo.getRow().isEmpty()) {
-//					System.out.println("No more data available.");
-//					hasMoreData = false;
-//				} else {
-//					List<WifiRow> rows = wifiInfo.getRow();
-//					for (WifiRow row : rows) {
-//						double distance = calculateDistance(userLat, userLon, row.getLatitude(), row.getLongitude());
-//						row.setDistance(distance); // 거리 계산 후 저장
-//						dbHelper.insertWifiInfo(row);
-//					}
-//				}
-//
-//				// 다음 요청 범위 설정
-//				start = end + 1;
-//				end += 1000;
-//			} catch (Exception e) {
-//				System.err.println("Failed to fetch data from API for range " + start + " to " + end);
-//				e.printStackTrace();
-//				break;
-//			}
+//		// 소수의 데이터만
+//		String result;
+//		try {
+//			result = ok.getApiResult(1, 1000); // API 데이터 범위 확장
+//		} catch (IOException e) {
+//			System.err.println("Failed to fetch data from API.");
+//			e.printStackTrace();
+//			return;
 //		}
 //
+//		if (result == null || result.isEmpty()) {
+//			System.err.println("API result is null or empty.");
+//			return;
+//		}
+//
+//		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//		TbPublicWifiInfoWrapper wifiInfoWrapper = gson.fromJson(result, TbPublicWifiInfoWrapper.class);
+//		TbPublicWifiInfo wifiInfo = wifiInfoWrapper.getTbPublicWifiInfo();
+//
+//		if (wifiInfo == null) {
+//			System.err.println("Failed to parse JSON into TbPublicWifiInfo.");
+//			return;
+//		}
+//
+//		dbHelper.resetWifiInfo();
+//		dbHelper.createTable();
+//
+//		List<WifiRow> rows = wifiInfo.getRow();
+//		if (rows != null && !rows.isEmpty()) {
+//			for (WifiRow row : rows) {
+//				double distance = calculateDistance(userLat, userLon, row.getLatitude(), row.getLongitude());
+//				row.setDistance(distance); // 거리 계산 후 저장
+//				dbHelper.insertWifiInfo(row);
+//			}
+//		} else {
+//			System.err.println("No rows found in the data.");
+//		}
+
+		// 반복문으로 공공데이터 db에 삽입
+		int start = 1;
+		int end = 1000;
+		boolean hasMoreData = true;
+		while (hasMoreData) {
+			try {
+				System.out.println("Fetching data from " + start + " to " + end);
+				String result = ok.getApiResult(start, end);
+
+				// API 응답이 null이거나 비어 있는지 확인
+				if (result == null || result.isEmpty()) {
+					System.err.println("API result is null or empty.");
+					break;
+				}
+				// JSON 파싱
+				Gson gson = new GsonBuilder().setPrettyPrinting().create();
+				TbPublicWifiInfoWrapper wifiInfoWrapper = gson.fromJson(result, TbPublicWifiInfoWrapper.class);
+				TbPublicWifiInfo wifiInfo = wifiInfoWrapper.getTbPublicWifiInfo();
+
+				if (wifiInfo == null || wifiInfo.getRow() == null || wifiInfo.getRow().isEmpty()) {
+					System.out.println("No more data available.");
+					hasMoreData = false;
+				} else {
+					List<WifiRow> rows = wifiInfo.getRow();
+					for (WifiRow row : rows) {
+						double distance = calculateDistance(userLat, userLon, row.getLatitude(), row.getLongitude());
+						row.setDistance(distance); // 거리 계산 후 저장
+						dbHelper.insertWifiInfo(row);
+					}
+				}
+
+				// 다음 요청 범위 설정
+				start = end + 1;
+				end += 1000;
+			} catch (Exception e) {
+				System.err.println("Failed to fetch data from API for range " + start + " to " + end);
+				e.printStackTrace();
+				break;
+			}
+		}
+
 	}
 
 	/**
