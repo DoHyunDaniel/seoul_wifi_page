@@ -11,40 +11,37 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
-import com.seoul_wifi_page.dto.WifiRow;
-import com.seoul_wifi_page.service.IndexService;
+import com.seoul_wifi_page.dto.BookmarkGroup;
+import com.seoul_wifi_page.service.BookmarkGroupService;
 
-@WebServlet("/get-results")
-public class GetResultsServlet extends HttpServlet {
+@WebServlet("/bookmark-group-get-results")
+public class GetBookmarkGroupServlet extends HttpServlet {
 
-	private IndexService wifiService;
+	private BookmarkGroupService bookmarkGroupService;
 
 	@Override
 	public void init() throws ServletException {
 		ServletContext context = getServletContext();
-		wifiService = new IndexService(context);
+		bookmarkGroupService = new BookmarkGroupService(context);
 	}
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		try {
-			// DB에서 상위 20개의 WiFi 데이터 가져오기
-			List<WifiRow> wifiData = wifiService.getTopWifiInfo(20);
-
-			// 총 WiFi 데이터 개수 가져오기
-			int totalCount = wifiService.getWifiTotalCount();
+			List<BookmarkGroup> bookmarkGroupList = bookmarkGroupService.getAllBookmarkGroupInfo();
+//	        int totalCount = searchHistoryService.getTotalCount();
 
 			// JSON 응답 준비
 			response.setContentType("application/json");
 			response.setCharacterEncoding("UTF-8");
 
 			// 데이터가 있으면 JSON 변환 후 응답
-			if (wifiData != null && !wifiData.isEmpty()) {
-				String jsonResponse = new Gson().toJson(new ResultsResponse(wifiData, totalCount));
+			if (bookmarkGroupList != null && !bookmarkGroupList.isEmpty()) {
+				String jsonResponse = new Gson().toJson(new ResultsResponse(bookmarkGroupList));
 				response.getWriter().write(jsonResponse);
 			} else {
-				response.getWriter().write("{\"wifiData\": [], \"totalCount\": 0}");
+				response.getWriter().write("{\"bookmarkGroupList\": []}");
 			}
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -57,12 +54,12 @@ public class GetResultsServlet extends HttpServlet {
 
 	// 응답 데이터 구조를 정의하는 내부 클래스
 	private static class ResultsResponse {
-		private List<WifiRow> wifiData;
-		private int totalCount;
+		private List<BookmarkGroup> bookmarkGroupList;
+//		private int totalCount;
 
-		public ResultsResponse(List<WifiRow> wifiData, int totalCount) {
-			this.wifiData = wifiData;
-			this.totalCount = totalCount;
+		public ResultsResponse(List<BookmarkGroup> bookmarkGroupList) {
+			this.bookmarkGroupList = bookmarkGroupList;
+//			this.totalCount = totalCount;
 		}
 	}
 }

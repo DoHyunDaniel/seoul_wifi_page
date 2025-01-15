@@ -14,7 +14,9 @@
 			<p>
 				<a href="#" id="home">홈</a> | <a
 					href="/be1_java_web_study01/searchHistory.jsp" id="history">위치
-					히스토리 목록</a> | <a href="#" id="fetch-api">Open API 와이파이 정보 가져오기</a>
+					히스토리 목록</a> | <a href="#" id="fetch-api">Open API 와이파이 정보 가져오기</a> | <a
+					href="/be1_java_web_study01/bookmark.jsp" id="bookmark">북마크 보기</a>
+				| <a href="/be1_java_web_study01/bookmark-group.jsp" id="bookmark-group">북마크 그룹 관리</a> |
 			</p>
 		</nav>
 
@@ -42,7 +44,7 @@
 						<th>자치구</th>
 						<th>와이파이명</th>
 						<th>도로명주소</th>
-						<th>상세주소</th>
+						<%-- <th>상세주소</th>
 						<th>설치위치</th>
 						<th>설치유형</th>
 						<th>설치기관</th>
@@ -53,7 +55,8 @@
 						<th>WIFI 접속환경</th>
 						<th>X좌표</th>
 						<th>Y좌표</th>
-						<th>작업일자</th>
+						<th>작업일자</th> --%>
+
 					</tr>
 				</thead>
 				<tbody id="wifi-table-body"></tbody>

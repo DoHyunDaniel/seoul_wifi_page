@@ -1,3 +1,10 @@
+
+document.addEventListener("DOMContentLoaded", async () => {
+	const response = await fetch(`/be1_java_web_study01/get-results`);
+	const data = await response.json(); // JSON 데이터 파싱
+	document.getElementById("wifi-count").textContent = data.totalCount; // 최신 WiFi 개수 업데이트
+}
+);
 document.addEventListener("DOMContentLoaded", () => {
 	const fetchApiButton = document.getElementById("fetch-api");
 	const latitudeInput = document.getElementById("latitude");
@@ -114,26 +121,19 @@ document.addEventListener("DOMContentLoaded", () => {
                     <td>${(wifi.distance).toFixed(2)} km</td>
                     <td>${wifi.X_SWIFI_MGR_NO}</td>
                     <td>${wifi.X_SWIFI_WRDOFC}</td>
-                    <td>${wifi.X_SWIFI_MAIN_NM}</td>
+                    <td><a href="/be1_java_web_study01/detail.jsp?managerNo=${wifi.X_SWIFI_MGR_NO}">
+                        ${wifi.X_SWIFI_MAIN_NM}
+                    </a></td>
                     <td>${wifi.X_SWIFI_ADRES1}</td>
-                    <td>${wifi.X_SWIFI_ADRES2}</td>
-                    <td>${wifi.X_SWIFI_INSTL_FLOOR}</td>
-                    <td>${wifi.X_SWIFI_INSTL_TY}</td>
-                    <td>${wifi.X_SWIFI_INSTL_MBY}</td>
-                    <td>${wifi.X_SWIFI_SVC_SE}</td>
-                    <td>${wifi.X_SWIFI_CMCWR}</td>
-                    <td>${wifi.X_SWIFI_CNSTC_YEAR}</td>
-                    <td>${wifi.X_SWIFI_INOUT_DOOR}</td>
-                    <td>${wifi.X_SWIFI_REMARS3}</td>
-                    <td>${wifi.LNT}</td>
-                    <td>${wifi.LAT}</td>
-                    <td>${wifi.WORK_DTTM}</td>
                 </tr>
             `;
+
 			tableBody.innerHTML += row;
 		});
 	}
-	function updateWifiCount(totalCount) {
-		wifiCountSpan.textContent = totalCount; // 개수 업데이트
-	}
+
 });
+function updateWifiCount(totalCount) {
+	wifiCountSpan.textContent = totalCount; // 개수 업데이트
+}
+

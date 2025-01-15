@@ -10,17 +10,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.JsonObject;
-import com.seoul_wifi_page.service.WifiService;
+import com.seoul_wifi_page.service.IndexService;
 
 @WebServlet("/fetch-api")
 public class FetchApiServlet extends HttpServlet {
 
-	private WifiService wifiService;
+	private IndexService wifiService;
 
 	@Override
 	public void init() throws ServletException {
 		ServletContext context = getServletContext();
-		wifiService = new WifiService(context);
+		wifiService = new IndexService(context);
 	}
 
 	@Override

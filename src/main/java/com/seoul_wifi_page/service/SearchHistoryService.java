@@ -5,14 +5,14 @@ import java.util.List;
 import javax.servlet.ServletContext;
 
 import com.seoul_wifi_page.dto.SearchHistory;
-import com.seoul_wifi_page.repository.SearchHistoryRepository;
+import com.seoul_wifi_page.repository.SearchHistoryRepo;
 
 public class SearchHistoryService {
 
-    private final SearchHistoryRepository repository;
+    private final SearchHistoryRepo repository;
 
     public SearchHistoryService(ServletContext context) {
-        this.repository = new SearchHistoryRepository(context);
+        this.repository = new SearchHistoryRepo(context);
     }
 
     public List<SearchHistory> getSearchHistory() {

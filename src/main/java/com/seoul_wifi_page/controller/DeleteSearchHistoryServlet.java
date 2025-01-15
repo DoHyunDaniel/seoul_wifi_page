@@ -9,16 +9,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.seoul_wifi_page.repository.SearchHistoryRepository;
+import com.seoul_wifi_page.repository.SearchHistoryRepo;
 
 @WebServlet("/deleteSearchHistory")
 public class DeleteSearchHistoryServlet extends HttpServlet {
-	private SearchHistoryRepository repository;
+	private SearchHistoryRepo repository;
 
 	@Override
 	public void init() throws ServletException {
 		ServletContext context = getServletContext();
-		repository = new SearchHistoryRepository(context);
+		repository = new SearchHistoryRepo(context);
 	}
 
 	@Override

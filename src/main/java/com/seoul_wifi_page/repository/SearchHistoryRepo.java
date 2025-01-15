@@ -8,11 +8,11 @@ import javax.servlet.ServletContext;
 
 import com.seoul_wifi_page.dto.SearchHistory;
 
-public class SearchHistoryRepository {
+public class SearchHistoryRepo {
 
 	private final String dbUrl;
 
-	public SearchHistoryRepository(ServletContext servletContext) {
+	public SearchHistoryRepo(ServletContext servletContext) {
 		try {
 			String dbPath = servletContext.getRealPath("/wifiinfo.db"); // 루트 디렉터리에 db 파일이 위치
 			this.dbUrl = "jdbc:sqlite:" + dbPath;

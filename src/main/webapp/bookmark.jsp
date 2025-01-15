@@ -1,16 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>위치 히스토리 목록</title>
+<title>북마크 정보</title>
 <link rel="stylesheet" href="css/style.css?v=1.0">
 </head>
 <body>
 	<div class="container">
-		<h1>위치 히스토리 목록</h1>
+		<h1>북마크 정보</h1>
 		<nav>
 			<p>
 				<a href="#" id="home">홈</a> | <a
@@ -21,27 +20,29 @@
 					그룹 관리</a> |
 			</p>
 		</nav>
-		<section>
-			<h2>저장된 위치 히스토리</h2>
-			<p>
-				총 <span id="total-count">0</span>개의 위치 기록이 저장되어 있습니다.
-			</p>
-			<table id="history-table" border="1">
+
+		<section class="wifi-info">
+			<select id="bookmark-group-select" name="bookmarkGroupId">
+			</select> 
+			<!-- WiFi 테이블 -->
+			<table id="bookmark-table" border="1">
 				<thead>
 					<tr>
 						<th>ID</th>
-						<th>X좌표</th>
-						<th>Y좌표</th>
-						<th>조회일자</th>
+						<th>북마크 그룹 이름</th>
+						<th>와이파이명</th>
+						<th>등록일자</th>
 						<th>비고</th>
 					</tr>
 				</thead>
-				<tbody>
-					<!-- 데이터는 JavaScript로 추가 -->
-				</tbody>
+				<tbody id="bookmark-table-tbody"></tbody>
+
 			</table>
+
+
 		</section>
 	</div>
-	<script src="js/searchHistory.js?v=1.0"></script>
+	<!-- JavaScript 파일 -->
+	<script src="js/bookmark.js?v=1.03"></script>
 </body>
 </html>

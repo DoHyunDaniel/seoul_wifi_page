@@ -10,14 +10,13 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 
-import com.seoul_wifi_page.dto.SearchHistory;
 import com.seoul_wifi_page.dto.WifiRow;
 
-public class SQLiteHelper {
+public class IndexRepo {
 	private String dbUrl;
 
 	// 생성자에서 ServletContext를 받아 DB 경로 설정
-	public SQLiteHelper(ServletContext servletContext) {
+	public IndexRepo(ServletContext servletContext) {
 		try {
 			String dbPath = servletContext.getRealPath("/wifiinfo.db"); // 루트 디렉터리에 db 파일이 위치
 			this.dbUrl = "jdbc:sqlite:" + dbPath;
@@ -151,6 +150,7 @@ public class SQLiteHelper {
 		}
 	}
 
+	// 와이파이 총 갯수 세기
 	public int getWifiCount() {
 		String countSQL = "SELECT COUNT(*) AS count FROM WifiInfo;";
 		try (Connection conn = connect();
@@ -163,6 +163,22 @@ public class SQLiteHelper {
 			e.printStackTrace();
 		}
 		return 0; // 기본값 반환
+	}
+
+	// 와이파이 상세정보 구하기
+	public WifiRow getWifiByManagerNo(String managerNo) {
+		String query = "SELECT * FROM WifiInfo WHERE managerNo = ?;";
+		try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(query)) {
+			pstmt.setString(1, managerNo);
+			try (ResultSet rs = pstmt.executeQuery()) {
+				if (rs.next()) {
+					return mapRow(rs);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }

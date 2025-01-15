@@ -11,58 +11,58 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
-import com.seoul_wifi_page.dto.WifiRow;
-import com.seoul_wifi_page.service.IndexService;
+import com.seoul_wifi_page.dto.Bookmark;
+import com.seoul_wifi_page.service.BookmarkService;
 
-@WebServlet("/get-results")
-public class GetResultsServlet extends HttpServlet {
+@WebServlet("/bookmark-get-results")
+public class GetBookmarkServlet extends HttpServlet {
 
-	private IndexService wifiService;
+	private BookmarkService bookmarkService;
 
 	@Override
 	public void init() throws ServletException {
 		ServletContext context = getServletContext();
-		wifiService = new IndexService(context);
+		bookmarkService = new BookmarkService(context);
 	}
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		try {
-			// DB에서 상위 20개의 WiFi 데이터 가져오기
-			List<WifiRow> wifiData = wifiService.getTopWifiInfo(20);
+			int groupIdParam = Integer.parseInt(request.getParameter("groupId"));
+			List<Bookmark> bookmarkList = bookmarkService.getAllBookmarkInfo(groupIdParam);
 
-			// 총 WiFi 데이터 개수 가져오기
-			int totalCount = wifiService.getWifiTotalCount();
+//			System.out.println(bookmarkList);
+//	        int totalCount = searchHistoryService.getTotalCount();
 
 			// JSON 응답 준비
 			response.setContentType("application/json");
 			response.setCharacterEncoding("UTF-8");
 
 			// 데이터가 있으면 JSON 변환 후 응답
-			if (wifiData != null && !wifiData.isEmpty()) {
-				String jsonResponse = new Gson().toJson(new ResultsResponse(wifiData, totalCount));
+			if (bookmarkList != null && !bookmarkList.isEmpty()) {
+				String jsonResponse = new Gson().toJson(new ResultsResponse(bookmarkList));
 				response.getWriter().write(jsonResponse);
 			} else {
-				response.getWriter().write("{\"wifiData\": [], \"totalCount\": 0}");
+				response.getWriter().write("{\"bookmarkList\": []}");
 			}
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			response.setContentType("application/json");
 			response.setCharacterEncoding("UTF-8");
-			response.getWriter().write("{\"error\": \"WiFi 데이터를 가져오는 중 문제가 발생했습니다.\"}");
+			response.getWriter().write("{\"error\": \"Bookmark 데이터를 가져오는 중 문제가 발생했습니다.\"}");
 			e.printStackTrace();
 		}
 	}
 
 	// 응답 데이터 구조를 정의하는 내부 클래스
 	private static class ResultsResponse {
-		private List<WifiRow> wifiData;
-		private int totalCount;
+		private List<Bookmark> bookmarkList;
+//		private int totalCount;
 
-		public ResultsResponse(List<WifiRow> wifiData, int totalCount) {
-			this.wifiData = wifiData;
-			this.totalCount = totalCount;
+		public ResultsResponse(List<Bookmark> bookmarkList) {
+			this.bookmarkList = bookmarkList;
+//			this.totalCount = totalCount;
 		}
 	}
 }

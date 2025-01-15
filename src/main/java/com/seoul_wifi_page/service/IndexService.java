@@ -12,13 +12,13 @@ import com.google.gson.GsonBuilder;
 import com.seoul_wifi_page.dto.TbPublicWifiInfo;
 import com.seoul_wifi_page.dto.TbPublicWifiInfoWrapper;
 import com.seoul_wifi_page.dto.WifiRow;
-import com.seoul_wifi_page.repository.SQLiteHelper;
+import com.seoul_wifi_page.repository.IndexRepo;
 
-public class WifiService {
-	private final SQLiteHelper dbHelper;
+public class IndexService {
+	private final IndexRepo dbHelper;
 
-	public WifiService(ServletContext servletContext) {
-		this.dbHelper = new SQLiteHelper(servletContext);
+	public IndexService(ServletContext servletContext) {
+		this.dbHelper = new IndexRepo(servletContext);
 	}
 
 	/**
@@ -114,24 +114,20 @@ public class WifiService {
 
 	}
 
-	/**
-	 * SQLite 데이터베이스에서 WiFi 정보 가져오기
-	 */
+	// SQLite 데이터베이스에서 WiFi 정보 가져오기
+
 	public List<WifiRow> getAllWifiInfo() {
 		return dbHelper.getAllWifiInfo();
 	}
 
-	/**
-	 * SQLite 데이터베이스에서 상위 N개의 WiFi 정보 가져오기
-	 */
+	// SQLite 데이터베이스에서 상위 N개의 WiFi 정보 가져오기
+
 	public List<WifiRow> getTopWifiInfo(int limit) {
 		return dbHelper.getTopWifiInfo(limit);
 	}
 
+	// Haversine 공식을 사용하여 거리 계산
 
-	/**
-	 * Haversine 공식을 사용하여 거리 계산
-	 */
 	private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
 		final int R = 6371; // 지구 반경 (km)
 		double latDistance = Math.toRadians(lat2 - lat1);
@@ -143,7 +139,13 @@ public class WifiService {
 		return R * c; // 거리 반환
 	}
 
+	// 와이파이 총 갯수 세기
 	public int getWifiTotalCount() {
 		return dbHelper.getWifiCount();
+	}
+	
+	// 상세정보 구하기
+	public WifiRow getWifiDetailByManagerNo(String managerNo) {
+	    return dbHelper.getWifiByManagerNo(managerNo);
 	}
 }
