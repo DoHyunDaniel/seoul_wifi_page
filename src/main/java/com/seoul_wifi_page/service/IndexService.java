@@ -1,8 +1,6 @@
 package com.seoul_wifi_page.service;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -14,6 +12,10 @@ import com.seoul_wifi_page.dto.TbPublicWifiInfoWrapper;
 import com.seoul_wifi_page.dto.WifiRow;
 import com.seoul_wifi_page.repository.IndexRepo;
 
+/**
+ * 와이파이 정보 처리와 관련된 비즈니스 로직을 담당하는 서비스 클래스입니다.
+ * API 호출, 거리 계산, DB 저장 및 조회 기능을 제공합니다.
+ */
 public class IndexService {
 	private final IndexRepo dbHelper;
 
@@ -22,70 +24,34 @@ public class IndexService {
 	}
 
 	/**
-	 * API 호출 및 데이터베이스 저장
+	 * 서울시 공공 와이파이 API를 호출하여 데이터를 파싱하고,
+	 * DB에 삽입합니다. 사용자 위치를 기준으로 각 와이파이와의 거리를 계산하여 저장합니다.
+	 *
+	 * @param userLat 사용자의 위도
+	 * @param userLon 사용자의 경도
+	 * @throws IOException API 호출 실패 시 발생
 	 */
 	public void fetchAPI(double userLat, double userLon) throws IOException {
-
-		// 테이블 초기화 및 데이터 삽입
+		// DB 초기화
 		dbHelper.resetWifiInfo();
 		dbHelper.createTable();
 
-		// API 호출
 		MyOkHttp3 ok = new MyOkHttp3();
 
-//		// 소수의 데이터만
-//		String result;
-//		try {
-//			result = ok.getApiResult(1, 1000); // API 데이터 범위 확장
-//		} catch (IOException e) {
-//			System.err.println("Failed to fetch data from API.");
-//			e.printStackTrace();
-//			return;
-//		}
-//
-//		if (result == null || result.isEmpty()) {
-//			System.err.println("API result is null or empty.");
-//			return;
-//		}
-//
-//		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//		TbPublicWifiInfoWrapper wifiInfoWrapper = gson.fromJson(result, TbPublicWifiInfoWrapper.class);
-//		TbPublicWifiInfo wifiInfo = wifiInfoWrapper.getTbPublicWifiInfo();
-//
-//		if (wifiInfo == null) {
-//			System.err.println("Failed to parse JSON into TbPublicWifiInfo.");
-//			return;
-//		}
-//
-//		dbHelper.resetWifiInfo();
-//		dbHelper.createTable();
-//
-//		List<WifiRow> rows = wifiInfo.getRow();
-//		if (rows != null && !rows.isEmpty()) {
-//			for (WifiRow row : rows) {
-//				double distance = calculateDistance(userLat, userLon, row.getLatitude(), row.getLongitude());
-//				row.setDistance(distance); // 거리 계산 후 저장
-//				dbHelper.insertWifiInfo(row);
-//			}
-//		} else {
-//			System.err.println("No rows found in the data.");
-//		}
-
-		// 반복문으로 공공데이터 db에 삽입
 		int start = 1;
 		int end = 1000;
 		boolean hasMoreData = true;
+
 		while (hasMoreData) {
 			try {
 				System.out.println("Fetching data from " + start + " to " + end);
 				String result = ok.getApiResult(start, end);
 
-				// API 응답이 null이거나 비어 있는지 확인
 				if (result == null || result.isEmpty()) {
 					System.err.println("API result is null or empty.");
 					break;
 				}
-				// JSON 파싱
+
 				Gson gson = new GsonBuilder().setPrettyPrinting().create();
 				TbPublicWifiInfoWrapper wifiInfoWrapper = gson.fromJson(result, TbPublicWifiInfoWrapper.class);
 				TbPublicWifiInfo wifiInfo = wifiInfoWrapper.getTbPublicWifiInfo();
@@ -97,12 +63,11 @@ public class IndexService {
 					List<WifiRow> rows = wifiInfo.getRow();
 					for (WifiRow row : rows) {
 						double distance = calculateDistance(userLat, userLon, row.getLatitude(), row.getLongitude());
-						row.setDistance(distance); // 거리 계산 후 저장
+						row.setDistance(distance);
 						dbHelper.insertWifiInfo(row);
 					}
 				}
 
-				// 다음 요청 범위 설정
 				start = end + 1;
 				end += 1000;
 			} catch (Exception e) {
@@ -111,40 +76,63 @@ public class IndexService {
 				break;
 			}
 		}
-
 	}
 
-	// SQLite 데이터베이스에서 WiFi 정보 가져오기
-
+	/**
+	 * 전체 와이파이 정보를 DB에서 조회합니다.
+	 *
+	 * @return 전체 와이파이 정보 리스트
+	 */
 	public List<WifiRow> getAllWifiInfo() {
 		return dbHelper.getAllWifiInfo();
 	}
 
-	// SQLite 데이터베이스에서 상위 N개의 WiFi 정보 가져오기
-
+	/**
+	 * 가까운 순으로 상위 N개의 와이파이 정보를 조회합니다.
+	 *
+	 * @param limit 상위 개수 제한
+	 * @return 가까운 순 와이파이 정보 리스트
+	 */
 	public List<WifiRow> getTopWifiInfo(int limit) {
 		return dbHelper.getTopWifiInfo(limit);
 	}
 
-	// Haversine 공식을 사용하여 거리 계산
-
+	/**
+	 * 두 좌표 간의 거리를 계산합니다. (Haversine 공식 사용)
+	 *
+	 * @param lat1 위도1
+	 * @param lon1 경도1
+	 * @param lat2 위도2
+	 * @param lon2 경도2
+	 * @return 거리 (단위: km)
+	 */
 	private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
-		final int R = 6371; // 지구 반경 (km)
+		final int R = 6371; // 지구 반지름 (km)
 		double latDistance = Math.toRadians(lat2 - lat1);
 		double lonDistance = Math.toRadians(lon2 - lon1);
 
-		double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2) + Math.cos(Math.toRadians(lat1))
-				* Math.cos(Math.toRadians(lat2)) * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+		double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+				+ Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+				* Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
 		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-		return R * c; // 거리 반환
+		return R * c;
 	}
 
-	// 와이파이 총 갯수 세기
+	/**
+	 * 저장된 전체 와이파이 개수를 반환합니다.
+	 *
+	 * @return 와이파이 총 개수
+	 */
 	public int getWifiTotalCount() {
 		return dbHelper.getWifiCount();
 	}
-	
-	// 상세정보 구하기
+
+	/**
+	 * 관리자 번호를 기준으로 특정 와이파이 상세 정보를 조회합니다.
+	 *
+	 * @param managerNo 관리자 번호
+	 * @return 해당 와이파이의 상세 정보
+	 */
 	public WifiRow getWifiDetailByManagerNo(String managerNo) {
 	    return dbHelper.getWifiByManagerNo(managerNo);
 	}

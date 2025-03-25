@@ -67,6 +67,6 @@
 		</section>
 	</div>
 	<!-- JavaScript 파일 -->
-	<script src="js/index.js?v=1.0"></script>
+	<script src="js/index.js?v=1.02"></script>
 </body>
 </html>

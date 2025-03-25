@@ -14,29 +14,44 @@ import com.google.gson.Gson;
 import com.seoul_wifi_page.dto.BookmarkGroup;
 import com.seoul_wifi_page.service.BookmarkGroupService;
 
+/**
+ * 북마크 그룹 목록을 JSON 형식으로 반환하는 서블릿입니다.
+ * <p>
+ * 요청 URL: /bookmark-group-get-results  
+ * 메서드: GET  
+ * 응답: 북마크 그룹 리스트(JSON)
+ */
 @WebServlet("/bookmark-group-get-results")
 public class GetBookmarkGroupServlet extends HttpServlet {
 
 	private BookmarkGroupService bookmarkGroupService;
 
+	/**
+	 * 서블릿 초기화 시 BookmarkGroupService를 생성합니다.
+	 */
 	@Override
 	public void init() throws ServletException {
 		ServletContext context = getServletContext();
 		bookmarkGroupService = new BookmarkGroupService(context);
 	}
 
+	/**
+	 * 북마크 그룹 데이터를 조회하여 JSON 형식으로 반환합니다.
+	 * <p>
+	 * 북마크 그룹이 없을 경우 빈 배열 반환, 실패 시 에러 메시지 반환
+	 *
+	 * @param request  HttpServletRequest
+	 * @param response HttpServletResponse
+	 */
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		try {
 			List<BookmarkGroup> bookmarkGroupList = bookmarkGroupService.getAllBookmarkGroupInfo();
-//	        int totalCount = searchHistoryService.getTotalCount();
 
-			// JSON 응답 준비
 			response.setContentType("application/json");
 			response.setCharacterEncoding("UTF-8");
 
-			// 데이터가 있으면 JSON 변환 후 응답
 			if (bookmarkGroupList != null && !bookmarkGroupList.isEmpty()) {
 				String jsonResponse = new Gson().toJson(new ResultsResponse(bookmarkGroupList));
 				response.getWriter().write(jsonResponse);
@@ -52,14 +67,14 @@ public class GetBookmarkGroupServlet extends HttpServlet {
 		}
 	}
 
-	// 응답 데이터 구조를 정의하는 내부 클래스
+	/**
+	 * 북마크 그룹 리스트를 JSON 구조로 감싸는 응답 객체입니다.
+	 */
 	private static class ResultsResponse {
 		private List<BookmarkGroup> bookmarkGroupList;
-//		private int totalCount;
 
 		public ResultsResponse(List<BookmarkGroup> bookmarkGroupList) {
 			this.bookmarkGroupList = bookmarkGroupList;
-//			this.totalCount = totalCount;
 		}
 	}
 }

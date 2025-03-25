@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", async () => {
 	const response = await fetch(`/be1_java_web_study01/get-results`);
 	const data = await response.json(); // JSON 데이터 파싱
